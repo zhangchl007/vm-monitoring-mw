@@ -82,6 +82,21 @@ See [molecule](./playbooks/molecule/cluster) directory for details. The scenario
 sets up a container for each component. The scenario can be deployed by
 using `make molecule-converge-cluster-integration` command.
 
+## Terraform-driven VM provisioning & inventory generation
+
+The `terraform/VictoriaMetrics` configuration provisions the Azure infrastructure that backs the cluster-oriented
+roles and now emits an inventory file automatically. Key behaviors:
+
+- Define hosts in `environments/<env>-variables.tfvars` using the `roles` attribute per VM. A VM can implement several
+  roles simultaneously (e.g. both `vmselect` and `vminsert`).
+- Enable `merge_vmselect_vminsert_when_sparse` to treat any existing `vmselect` hosts as the `vminsert` pool too when you
+  do not want to run separate nodes.
+- After `terraform apply`, the file `inventory/cluster-inventory` is rendered from the actual VM outputs, ensuring
+  Ansible always targets the hosts that were just created.
+
+Tweak `inventory_groups_order`, `inventory_groups_post_children`, `inventory_cluster_children`, or
+`inventory_output_path` variables if you need to adjust the file layout or destination.
+
 # Development
 
 In order to set up development environment, you need to have `docker`, `python` and `make` installed.

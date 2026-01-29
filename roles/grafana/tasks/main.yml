@@ -1,0 +1,9 @@
+---
+- name: Pre-installation steps
+  ansible.builtin.import_tasks: preinstall.yml
+
+- name: Install Grafana binaries
+  ansible.builtin.import_tasks: install.yml
+
+- name: Configure Grafana service
+  ansible.builtin.import_tasks: configure.yml

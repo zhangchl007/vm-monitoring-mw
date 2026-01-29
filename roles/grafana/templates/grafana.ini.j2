@@ -1,0 +1,8 @@
+{{ ansible_managed | comment }}
+
+{% for section, values in grafana_ini_sections.items() %}
+[{{ section }}]
+{% for key, value in values.items() %}{{ key }} = {{ value }}
+{% endfor %}
+
+{% endfor %}

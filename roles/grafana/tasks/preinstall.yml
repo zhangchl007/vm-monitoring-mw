@@ -1,0 +1,47 @@
+---
+- name: Install required packages
+  ansible.builtin.package:
+    name: "{{ grafana_required_packages }}"
+    state: present
+  when: grafana_required_packages | length > 0
+
+- name: Ensure grafana group exists
+  ansible.builtin.group:
+    name: "{{ grafana_group }}"
+    state: present
+
+- name: Ensure grafana user exists
+  ansible.builtin.user:
+    name: "{{ grafana_user }}"
+    group: "{{ grafana_group }}"
+    system: true
+    shell: "/usr/sbin/nologin"
+    home: "{{ grafana_data_dir }}"
+    create_home: false
+
+- name: Create Grafana directories
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ item.owner | default('root') }}"
+    group: "{{ item.group | default('root') }}"
+    mode: "{{ item.mode | default('0755') }}"
+  loop:
+    - path: "{{ grafana_install_dir }}"
+    - path: "{{ grafana_config_dir }}"
+      owner: "root"
+      group: "{{ grafana_group }}"
+      mode: "0750"
+    - path: "{{ grafana_data_dir }}"
+      owner: "{{ grafana_user }}"
+      group: "{{ grafana_group }}"
+    - path: "{{ grafana_log_dir }}"
+      owner: "{{ grafana_user }}"
+      group: "{{ grafana_group }}"
+    - path: "{{ grafana_provisioning_dir }}"
+      owner: "root"
+      group: "{{ grafana_group }}"
+      mode: "0750"
+    - path: "{{ grafana_plugins_dir }}"
+      owner: "{{ grafana_user }}"
+      group: "{{ grafana_group }}"

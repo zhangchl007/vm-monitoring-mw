@@ -1,0 +1,63 @@
+---
+# Grafana package and download settings
+grafana_version: "10.4.6"
+grafana_platform: "linux"
+grafana_arch: "amd64"
+grafana_repo_url: "https://dl.grafana.com/oss/release"
+grafana_download_url: "{{ grafana_repo_url }}/grafana-{{ grafana_version }}.{{ grafana_platform }}-{{ grafana_arch }}.tar.gz"
+grafana_download_checksum: null
+
+# System settings
+grafana_user: "grafana"
+grafana_group: "grafana"
+
+grafana_install_dir: "/opt/grafana"
+grafana_config_dir: "/etc/grafana"
+grafana_data_dir: "/var/lib/grafana"
+grafana_log_dir: "/var/log/grafana"
+grafana_provisioning_dir: "{{ grafana_config_dir }}/provisioning"
+grafana_plugins_dir: "{{ grafana_data_dir }}/plugins"
+
+grafana_version_dir: "{{ grafana_install_dir }}/grafana-{{ grafana_version }}"
+grafana_current_link: "{{ grafana_install_dir }}/current"
+grafana_archive_path: "/tmp/grafana-{{ grafana_version }}.tar.gz"
+
+grafana_env_file: "/etc/default/grafana-server"
+grafana_env_extra: {}
+
+grafana_required_packages:
+  - tar
+  - gzip
+  - ca-certificates
+
+grafana_service_name: "grafana-server"
+grafana_service_enabled: true
+grafana_service_state: "started"
+
+# grafana.ini configuration
+# Nested dict: section -> option -> value
+grafana_ini_sections:
+  paths:
+    data: "{{ grafana_data_dir }}"
+    logs: "{{ grafana_log_dir }}"
+    plugins: "{{ grafana_plugins_dir }}"
+    provisioning: "{{ grafana_provisioning_dir }}"
+  server:
+    http_addr: "0.0.0.0"
+    http_port: 3000
+    domain: "{{ ansible_fqdn | default(inventory_hostname) }}"
+    root_url: "%(protocol)s://%(domain)s:%(http_port)s/"
+  security:
+    admin_user: "admin"
+    admin_password: "admin"
+  analytics:
+    reporting_enabled: false
+  database:
+    type: sqlite3
+    path: "{{ grafana_data_dir }}/grafana.db"
+
+# Additional provisioning assets (list of dicts with dest/src/content)
+grafana_provisioning_files: []
+
+# Grafana plugins to install (string or {name, version})
+grafana_plugins: []

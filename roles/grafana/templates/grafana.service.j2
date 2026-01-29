@@ -1,0 +1,18 @@
+{{ ansible_managed | comment }}
+[Unit]
+Description=Grafana Server
+After=network.target
+
+[Service]
+Type=simple
+User={{ grafana_user }}
+Group={{ grafana_group }}
+EnvironmentFile=-{{ grafana_env_file }}
+WorkingDirectory={{ grafana_current_link }}
+ExecStart={{ grafana_current_link }}/bin/grafana-server --config={{ grafana_config_dir }}/grafana.ini --homepath={{ grafana_current_link }}
+Restart=on-failure
+RestartSec=5
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

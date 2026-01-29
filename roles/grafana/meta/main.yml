@@ -1,0 +1,17 @@
+---
+galaxy_info:
+  author: VictoriaMetrics
+  description: Install and configure Grafana from the official release archives.
+  license: Apache-2.0
+  min_ansible_version: "2.13"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - "20.04"
+        - "22.04"
+    - name: Debian
+      versions:
+        - "11"
+        - "12"
+
+dependencies: []

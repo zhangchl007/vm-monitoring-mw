@@ -1,0 +1,31 @@
+---
+- name: Download Grafana archive
+  ansible.builtin.get_url:
+    url: "{{ grafana_download_url }}"
+    dest: "{{ grafana_archive_path }}"
+    mode: "0644"
+    checksum: "{{ grafana_download_checksum | default(omit, true) }}"
+
+- name: Unpack Grafana archive
+  ansible.builtin.unarchive:
+    src: "{{ grafana_archive_path }}"
+    dest: "{{ grafana_install_dir }}"
+    remote_src: true
+    creates: "{{ grafana_version_dir }}"
+
+- name: Ensure Grafana files are owned by root
+  ansible.builtin.file:
+    path: "{{ grafana_version_dir }}"
+    state: directory
+    recurse: true
+    owner: "root"
+    group: "root"
+    mode: "0755"
+
+- name: Update current Grafana symlink
+  ansible.builtin.file:
+    src: "{{ grafana_version_dir }}"
+    dest: "{{ grafana_current_link }}"
+    state: link
+    force: true
+  notify: restart grafana

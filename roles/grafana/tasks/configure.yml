@@ -1,0 +1,82 @@
+---
+- name: Render grafana.ini
+  ansible.builtin.template:
+    src: "grafana.ini.j2"
+    dest: "{{ grafana_config_dir }}/grafana.ini"
+    owner: "root"
+    group: "{{ grafana_group }}"
+    mode: "0640"
+  notify: restart grafana
+
+- name: Render Grafana environment file
+  ansible.builtin.template:
+    src: "grafana.env.j2"
+    dest: "{{ grafana_env_file }}"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  notify: restart grafana
+
+- name: Ensure provisioning subdirectories exist
+  ansible.builtin.file:
+    path: "{{ grafana_provisioning_dir }}/{{ item.dest | dirname }}"
+    state: directory
+    owner: "root"
+    group: "{{ grafana_group }}"
+    mode: "0750"
+  loop: "{{ grafana_provisioning_files }}"
+  loop_control:
+    label: "{{ item.dest }}"
+  when:
+    - grafana_provisioning_files | length > 0
+    - (item.dest | dirname) not in ["", "."]
+
+- name: Install provisioning files
+  ansible.builtin.copy:
+    dest: "{{ grafana_provisioning_dir }}/{{ item.dest }}"
+    owner: "root"
+    group: "{{ grafana_group }}"
+    mode: "{{ item.mode | default('0640') }}"
+    src: "{{ item.src | default(omit) }}"
+    content: "{{ item.content | default(omit) }}"
+  loop: "{{ grafana_provisioning_files }}"
+  loop_control:
+    label: "{{ item.dest }}"
+  when: grafana_provisioning_files | length > 0
+  notify: restart grafana
+
+- name: Install Grafana plugins
+  ansible.builtin.command: >-
+    {{ grafana_current_link }}/bin/grafana-cli plugins install {{ grafana_plugin_name }}{{ grafana_plugin_version_arg }}
+  args:
+    creates: "{{ grafana_plugins_dir }}/{{ grafana_plugin_name }}"
+  environment:
+    GF_PATHS_CONFIG: "{{ grafana_config_dir }}/grafana.ini"
+    GF_PATHS_DATA: "{{ grafana_data_dir }}"
+    GF_PATHS_HOME: "{{ grafana_current_link }}"
+    GF_PATHS_LOGS: "{{ grafana_log_dir }}"
+    GF_PATHS_PLUGINS: "{{ grafana_plugins_dir }}"
+  vars:
+    grafana_plugin_name: "{{ item.name | default(item) }}"
+    grafana_plugin_version_arg: "{{ (' ' + item.version) if (item is mapping and item.version is defined) else '' }}"
+  loop: "{{ grafana_plugins }}"
+  loop_control:
+    label: "{{ grafana_plugin_name }}"
+  when: grafana_plugins | length > 0
+  notify: restart grafana
+
+- name: Install Grafana systemd unit
+  ansible.builtin.template:
+    src: "grafana.service.j2"
+    dest: "/etc/systemd/system/{{ grafana_service_name }}.service"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  notify: restart grafana
+
+- name: Ensure Grafana service state
+  ansible.builtin.systemd:
+    name: "{{ grafana_service_name }}"
+    state: "{{ grafana_service_state }}"
+    enabled: "{{ grafana_service_enabled }}"
+    daemon_reload: true
