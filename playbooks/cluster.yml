@@ -29,25 +29,10 @@
   become: true
   hosts: vmauth
   vars:
-    # See: https://docs.victoriametrics.com/vmauth/#load-balancer-for-victoriametrics-cluster
-    vmauth_auth_config: |-
-      unauthorized_user:
-        url_map:
-          - src_paths:
-              - "/insert/.+"
-            url_prefix:
-            {% for insert in groups['vminsert'] %}
-            - "http://{{ insert }}:8480/"
-            {% endfor %}
-          - src_paths:
-              - "/select/.+"
-            url_prefix:
-           {% for select in groups['vmselect'] %}
-           - "http://{{ select }}:8481/"
-           {% endfor %}
-
+    vmauth_auth_config: "{{ lookup('template', playbook_dir ~ '/../templates/vmauth_auth_config.j2') }}"
   roles:
     - vmauth
+
 - name: Setup grafana
   become: true
   hosts: grafana

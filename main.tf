@@ -46,6 +46,15 @@ module "vm" {
 locals {
   vm_role_groups_base = module.vm.vm_role_groups
 
+  vm_host_connection_info = {
+    for vm_key, vm_detail in module.vm.vm_details :
+    vm_detail.vm_name => coalesce(
+      try(vm_detail.private_ip_address, null),
+      try(vm_detail.public_ip_address, null),
+      ""
+    )
+  }
+
   vm_role_groups_merged = var.merge_vmselect_vminsert_when_sparse ? merge(
     local.vm_role_groups_base,
     {
@@ -94,6 +103,7 @@ resource "local_file" "cluster_inventory" {
     groups_pre_children  = local.inventory_groups_pre_children
     groups_post_children = local.inventory_groups_post_children
     cluster_children     = local.inventory_cluster_children_filtered
+    host_connection      = local.vm_host_connection_info
   })
 
   filename = "${path.module}/${var.inventory_output_path}"

@@ -1,32 +1,16 @@
-
-
 [vmstorage]
-
-shein-test-vmstorage01
-
-shein-test-vmstorage02
-
-
-
+shein-test-vmstorage01 ansible_host=172.15.1.7
+shein-test-vmstorage02 ansible_host=172.15.1.5
 
 
 [vminsert]
-
-shein-test-vminsert01
-
-shein-test-vminsert02
-
-
-
+shein-test-vminsert01 ansible_host=172.15.1.4
+shein-test-vminsert02 ansible_host=172.15.1.6
 
 
 [vmselect]
-
-shein-test-vminsert01
-
-shein-test-vminsert02
-
-
+shein-test-vminsert01 ansible_host=172.15.1.4
+shein-test-vminsert02 ansible_host=172.15.1.6
 
 
 
@@ -41,20 +25,11 @@ vmstorage
 
 
 
-
-
 [vmauth]
-
-shein-test-vmauth01
-
-
-
+shein-test-vmauth01 ansible_host=172.15.1.9
 
 
 [grafana]
-
-shein-test-grafana01
-
-
+shein-test-grafana01 ansible_host=172.15.1.8
 
 

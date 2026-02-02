@@ -1,0 +1,15 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
+unauthorized_user:
+  url_map:
+    - src_paths:
+        - "/insert/.+"
+      url_prefix:
+{% for insert in groups['vminsert'] %}
+        - "http://{{ hostvars[insert].ansible_host | default(insert) }}:8480/"
+{% endfor %}
+    - src_paths:
+        - "/select/.+"
+      url_prefix:
+{% for select in groups['vmselect'] %}
+        - "http://{{ hostvars[select].ansible_host | default(select) }}:8481/"
+{% endfor %}
