@@ -13,6 +13,37 @@
     remote_src: true
     creates: "{{ grafana_version_dir }}"
 
+- name: Normalize Grafana directory name when archive uses a vendor "v" prefix
+  when: grafana_vendor_prefixed_dir != grafana_version_dir
+  block:
+    - name: Check Grafana binary in expected directory
+      ansible.builtin.stat:
+        path: "{{ grafana_version_dir }}/bin/grafana-server"
+      register: grafana_expected_binary
+
+    - name: Check vendor-prefixed Grafana directory
+      ansible.builtin.stat:
+        path: "{{ grafana_vendor_prefixed_dir }}/bin/grafana-server"
+      register: grafana_prefixed_binary
+      when: not grafana_expected_binary.stat.exists
+
+    - name: Remove placeholder Grafana directory before renaming
+      ansible.builtin.file:
+        path: "{{ grafana_version_dir }}"
+        state: absent
+      when:
+        - not grafana_expected_binary.stat.exists
+        - grafana_prefixed_binary is defined
+        - grafana_prefixed_binary.stat.exists
+
+    - name: Rename vendor-prefixed Grafana directory to expected name
+      ansible.builtin.command:
+        cmd: "mv {{ grafana_vendor_prefixed_dir }} {{ grafana_version_dir }}"
+      when:
+        - not grafana_expected_binary.stat.exists
+        - grafana_prefixed_binary is defined
+        - grafana_prefixed_binary.stat.exists
+
 - name: Ensure Grafana files are owned by root
   ansible.builtin.file:
     path: "{{ grafana_version_dir }}"
@@ -26,6 +57,14 @@
   ansible.builtin.file:
     src: "{{ grafana_version_dir }}"
     dest: "{{ grafana_current_link }}"
+    state: link
+    force: true
+  notify: restart grafana
+
+- name: Ensure Grafana "current" symlink points to extracted release
+  ansible.builtin.file:
+    path: "{{ grafana_current_link }}"
+    src: "{{ grafana_install_dir }}/grafana-{{ grafana_version }}"
     state: link
     force: true
   notify: restart grafana

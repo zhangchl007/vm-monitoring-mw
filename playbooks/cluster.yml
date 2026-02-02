@@ -48,3 +48,8 @@
 
   roles:
     - vmauth
+- name: Setup grafana
+  become: true
+  hosts: grafana
+  roles:
+    - grafana
