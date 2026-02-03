@@ -6,7 +6,7 @@ grafana_provisioning_files:
         - name: VictoriaMetrics
           type: prometheus
           access: proxy
-          url: http://{{ hostvars[groups['vmauth'][0]].ansible_host }}:8481
+          url: http://{{ hostvars[groups['vmauth'][0]].ansible_host }}:8427
           isDefault: true
           jsonData:
             httpMethod: POST
