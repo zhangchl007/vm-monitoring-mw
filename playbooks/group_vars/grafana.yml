@@ -1,0 +1,12 @@
+grafana_provisioning_files:
+  - dest: datasources/victoriametrics.yaml
+    content: |
+      apiVersion: 1
+      datasources:
+        - name: VictoriaMetrics
+          type: prometheus
+          access: proxy
+          url: http://{{ hostvars[groups['vmauth'][0]].ansible_host }}:8481
+          isDefault: true
+          jsonData:
+            httpMethod: POST
