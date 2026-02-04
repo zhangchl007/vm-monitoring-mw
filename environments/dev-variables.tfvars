@@ -162,7 +162,7 @@ vms = {
     }
   }
 
-  vmstorage02 = {
+  vmstorage03 = {
     vm_name             = "vmstorage03"
     vm_size             = "Standard_D4s_v5"
     subnet_name         = "node-subnet"
