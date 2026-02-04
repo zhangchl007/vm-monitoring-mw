@@ -203,6 +203,20 @@ vms = {
       Purpose = "MessageBroker"
     }
   }
+
+  vmagent01 = {
+    vm_name             = "vmagent01"
+    vm_size             = "Standard_D2s_v5"
+    subnet_name         = "node-subnet"
+    admin_username      = "azureuser"
+    ssh_public_key_path = "~/.ssh/id_rsa.pub"
+    os_type             = "linux"
+    enable_public_ip    = false
+    roles               = ["vmagent"]
+    tags = {
+      Purpose = "MetricsCollector"
+    }
+  }
 }
 
 

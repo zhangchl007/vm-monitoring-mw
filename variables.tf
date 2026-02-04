@@ -426,6 +426,7 @@ variable "inventory_groups_post_children" {
   default = [
     "vmauth",
     "grafana",
+    "vmagent",
   ]
 }
 

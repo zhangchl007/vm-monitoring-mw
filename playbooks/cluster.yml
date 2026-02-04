@@ -38,3 +38,11 @@
   hosts: grafana
   roles:
     - grafana
+
+- name: Setup vmagent
+  become: true
+  hosts: vmagent
+  roles:
+    - role: vmagent
+      vars:
+        vmagent_remote_write_host: "http://vmselect.internal:8481"
