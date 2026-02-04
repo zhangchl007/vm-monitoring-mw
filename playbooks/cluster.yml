@@ -45,4 +45,7 @@
   roles:
     - role: vmagent
       vars:
-        vmagent_remote_write_host: "http://vmselect.internal:8481"
+        vmagent_service_args:
+          remoteWrite.url:
+            - "http://{{ hostvars[groups['vminsert'][0]].ansible_host | default(groups['vminsert'][0]) }}:8480/insert/0/prometheus"
+            - "http://{{ hostvars[groups['vminsert'][1]].ansible_host | default(groups['vminsert'][1]) }}:8480/insert/0/prometheus"
