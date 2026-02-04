@@ -162,6 +162,20 @@ vms = {
     }
   }
 
+  vmstorage02 = {
+    vm_name             = "vmstorage03"
+    vm_size             = "Standard_D4s_v5"
+    subnet_name         = "node-subnet"
+    admin_username      = "azureuser"
+    ssh_public_key_path = "~/.ssh/id_rsa.pub"
+    os_type             = "linux"
+    enable_public_ip    = true
+    roles               = ["vmstorage"]
+    tags = {
+      Purpose = "MessageBroker"
+    }
+  }
+
   vminsert01 = {
     vm_name             = "vminsert01"
     vm_size             = "Standard_D4s_v5"
