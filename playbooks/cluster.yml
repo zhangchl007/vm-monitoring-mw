@@ -46,6 +46,10 @@
     - role: vmagent
       vars:
         vmagent_service_args:
+          promscrape.config: /opt/vic-vmagent/config.yml
+          remoteWrite.tmpDataPath: /opt/vic-vmagent/remotewrite-data
+          remoteWrite.maxDiskUsagePerURL: 30GB
+          remoteWrite.flushInterval: 5s
           remoteWrite.url:
             - "http://{{ hostvars[groups['vminsert'][0]].ansible_host | default(groups['vminsert'][0]) }}:8480/insert/0/prometheus"
             - "http://{{ hostvars[groups['vminsert'][1]].ansible_host | default(groups['vminsert'][1]) }}:8480/insert/0/prometheus"
